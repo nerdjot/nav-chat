@@ -76,8 +76,14 @@ function getUser(id)
   return users.find((user)=>user.id === id);
 }
 
+function getSenderName(message)
+{
+  return getUser(message.sender).name;
+}
+
 function isMyMessage(message)
 {
+  console.log("is my message: ", message.sender, myUserName);
   return (message.sender === myUserName);
 }
 
@@ -131,9 +137,14 @@ function getChannel(channelID)
   return channels.find((channel) => channelID === channel.id);
 }
 
+function isChannelGroup(channel)
+{
+  return channel.name !== 'na';
+}
+
 function getChannelName(channel)
 {
-  let isChannel = channel.name != 'na';
+  let isChannel = isChannelGroup(channel);
   return isChannel?channel.name:getOtherUserName(channel.members);
 }
 
@@ -203,7 +214,7 @@ function Channels({channels, messages, users, openChat})
 {
   return (
     <div className="col-4 h-100">
-      <div>Channels Navbar</div>
+      <div><h2>Channels</h2></div>
       {
       <ChannelsList openChat={openChat} channels={channels} messages={messages} users={users}></ChannelsList>
       }
@@ -218,12 +229,13 @@ function ChatDateBubble({message})
   )
 }
 
-function ChatBubble({message})
+function ChatBubble({message, showName})
 {
   let myMessage = isMyMessage(message);
   return (
     <div className={!myMessage?"row justify-content-start":"row justify-content-end"}>
       <div className={"col-5 rounded text-left "+ (!myMessage?"justify-content-start bg-light":" text-light justify-content-end bg-primary")}>
+        {showName?<div><h6>{getSenderName(message)}</h6></div>:<></>}
         {message.content}
         <div className={'text-right '+(!myMessage?'text-secondary':'')}>{getTimeFormat( new Date(Number(message.timestamp)*1000))}</div>
       </div>
@@ -234,18 +246,30 @@ function ChatBubble({message})
 function ChatBox({messages, channel})
 {
   let prevDate = '';
-  let currDate ='';
+  let currDate = '';
+  let prevSender = '';
+  let currSender = '';
   let sameDate = false;
+  let sameSender = false;
+  let showNamePic = false;
   return (
     <div className="col-8">
       <div><h3>{getChannelName(channel)}</h3></div>
       {messages.map((message) => 
       {
         currDate = message.timestamp;
+        currSender = message.sender;
         sameDate = isSameDate(prevDate, currDate);
+        sameSender = (currSender === prevSender);
+        console.log("isMymessage: ", isMyMessage(message));
+        showNamePic = ( !sameDate || !sameSender) && !isMyMessage(message) && isChannelGroup(channel);
         prevDate = currDate;
+        prevSender = currSender;
         return (
-          <>{sameDate?<></>:<ChatDateBubble message={message}></ChatDateBubble>}<ChatBubble message={message}></ChatBubble></>
+          <>
+          {sameDate?<></>:<ChatDateBubble message={message}></ChatDateBubble>}
+          {showNamePic?<div>pic</div>:<></>}
+          <ChatBubble showName={showNamePic} channel={channel} message={message}></ChatBubble></>
         ); 
       }
       )}
