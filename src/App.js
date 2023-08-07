@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import nav_data from './Data'
 import { FaCheckDouble } from "react-icons/fa";
+import { useState } from "react";
 
 let myUserName = '1';
 let messages = nav_data.messages;
@@ -26,6 +27,17 @@ function getTimeFormat(date)
   return date.toLocaleString([], {
     hour: '2-digit',
     minute: '2-digit'});
+}
+
+function isSameDate(timestamp1, timestamp2)
+{
+  let date1 = new Date(Number(timestamp1)*1000);
+  let date2 = new Date(Number(timestamp2)*1000);
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
 }
 
 function getDateFormat(date)
@@ -164,10 +176,10 @@ function getLastMessageTimeString(channel)
   return '';  
 }
 
-function ChannelsItem({channel, messages})
+function ChannelsItem({channel, messages, openChat})
 {
   return(
-    <div className="bg-light border rounded">
+    <div onClick={() => openChat(channel)} className="bg-light border rounded">
       <div className ='row justify-content-around'>
         <div className='col-7 text-left '><h5>{getChannelName(channel)}</h5></div>
         <div className='col-4 text-right'>{getLastMessageTimeString(channel)}</div>
@@ -180,20 +192,20 @@ function ChannelsItem({channel, messages})
   );
 }
 
-function ChannelsList({channels, messages, users})
+function ChannelsList({channels, messages, users, openChat})
 {
   return(
-    channels.map(channel => <ChannelsItem key={channel.id} users={users} channel={channel} messages={messages[channel.id]}></ChannelsItem>)
+    channels.map(channel => <ChannelsItem openChat={openChat} key={channel.id} users={users} channel={channel} messages={messages[channel.id]}></ChannelsItem>)
   );
 }
 
-function Channels({channels, messages, users})
+function Channels({channels, messages, users, openChat})
 {
   return (
     <div className="col-4 h-100">
       <div>Channels Navbar</div>
       {
-      <ChannelsList channels={channels} messages={messages} users={users}></ChannelsList>
+      <ChannelsList openChat={openChat} channels={channels} messages={messages} users={users}></ChannelsList>
       }
     </div>
   );
@@ -221,21 +233,37 @@ function ChatBubble({message})
 
 function ChatBox({messages, channel})
 {
+  let prevDate = '';
+  let currDate ='';
+  let sameDate = false;
   return (
     <div className="col-8">
       <div><h3>{getChannelName(channel)}</h3></div>
-      {messages.map(message => <><ChatDateBubble message={message}></ChatDateBubble><ChatBubble message={message}></ChatBubble></>)}
+      {messages.map((message) => 
+      {
+        currDate = message.timestamp;
+        sameDate = isSameDate(prevDate, currDate);
+        prevDate = currDate;
+        return (
+          <>{sameDate?<></>:<ChatDateBubble message={message}></ChatDateBubble>}<ChatBubble message={message}></ChatBubble></>
+        ); 
+      }
+      )}
     </div>
   );
 }
 
 function App() {
-  let currentChannelId = '1';
+  const [currentChannelID, setCurrentChanelID] = useState('home');
+  function openChat(channel)
+  {
+    setCurrentChanelID(channel.id);
+  }
   return (
     <div className="App"> 
       <div className="row">
-        <Channels channels={nav_data['channels']} messages={nav_data.messages} users={nav_data.users}></Channels>      
-        <ChatBox messages={messages[currentChannelId]} channel={getChannel(currentChannelId)}></ChatBox>
+        <Channels openChat={openChat}  channels={nav_data['channels']} messages={nav_data.messages} users={nav_data.users}></Channels>      
+        {(currentChannelID !== 'home')?<ChatBox messages={messages[currentChannelID]} channel={getChannel(currentChannelID)}></ChatBox>:<>Click on a Channel to start a chat!</>}
       </div>
     </div>
   );
