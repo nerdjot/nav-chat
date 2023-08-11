@@ -159,6 +159,7 @@ let messages =
         sender: '1',
         content: 'Hey',
         timestamp: '1690999511',
+        channel: '1',
         read_by:
         [
           '2'
@@ -169,6 +170,7 @@ let messages =
         sender: '2',
         content: 'Heyloo',
         timestamp: '1691099511',
+        channel: '1',
         read_by:
         [
           '1'
@@ -179,6 +181,7 @@ let messages =
         sender: '2',
         content: 'Wassuppp',
         timestamp: '1691399511',
+        channel: '1',
         read_by:
         [
           '1'
@@ -189,6 +192,7 @@ let messages =
         sender: '1',
         content: 'Nm man sup widya',
         timestamp: '1691699511',
+        channel: '1',
         read_by:
         [
           '2'
@@ -199,6 +203,7 @@ let messages =
         sender: '2',
         content: 'Nm man sup widya NAVVVVV',
         timestamp: '1691176455',
+        channel: '1',
         read_by:
         [
         ]
@@ -211,8 +216,10 @@ let messages =
         sender: '1',
         content: 'Hey',
         timestamp: '1690999511',
+        channel: '2',
         read_by:
         [
+          
         ]
       },
     ],
@@ -224,6 +231,7 @@ let messages =
         sender: '1',
         content: 'Hey',
         timestamp: '1690999511',
+        channel: '3',
         read_by:
         [
           '2', '3'
@@ -234,6 +242,7 @@ let messages =
         sender: '2',
         content: 'Heyloo',
         timestamp: '1690999513',
+        channel: '3',
         read_by:
         [
           '1', '3'
@@ -244,6 +253,7 @@ let messages =
         sender: '2',
         content: 'sup guys',
         timestamp: '1690999513',
+        channel: '3',
         read_by:
         [
           '1', '3'
@@ -254,6 +264,7 @@ let messages =
         sender: '3',
         content: 'Wassuppp',
         timestamp: '1690999520',
+        channel: '3',
         read_by:
         [
           '1', '2'
@@ -264,6 +275,7 @@ let messages =
         sender: '2',
         content: 'Nm man sup widya',
         timestamp: '1691699511',
+        channel: '3',
         read_by:
         [
           '3'
@@ -274,6 +286,7 @@ let messages =
         sender: '3',
         content: 'Nm man sup widya',
         timestamp: '1691310402',
+        channel: '3',
         read_by:
         [
           '2'

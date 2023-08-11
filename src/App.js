@@ -110,12 +110,20 @@ function getMessagesUnreadByMe(channel)
   return messagesUnreadByMe;
 }
 
-function isSentMessageReadByAll(channel)
+function isSentMessageReadByAll(message)
 {
-  let channelMessages = messages[channel.id];
-  let numberOfMessages = channelMessages.length;
+  if (isMyMessage(message))
+  {
+    let messageChannel = getChannel(message.channel);
+    return messageChannel?(message.read_by.length === messageChannel.members.length-1):false;
+  }
+  return false
+}
+
+function isLastMessageReadByAll(channel)
+{
   let lastMessage = getLastMessage(channel);
-  return lastMessage?(lastMessage.read_by.length === channel.members.length-1):false;
+  return isSentMessageReadByAll(lastMessage);
 }
 
 function UnreadMessages({messages, channel})
@@ -128,7 +136,7 @@ function UnreadMessages({messages, channel})
     noMessages?<></>:
     messagesUnreadByMe?
     <div style={{height:"25px", width:"25px"}} className='font-weight-bold rounded-circle bg-danger text-light'>{messagesUnreadByMe}</div>:
-    <div className={isSentMessageReadByAll(channel)?"text-primary":"text-secondary"}><FaCheckDouble/></div>
+    <div className={isLastMessageReadByAll(channel)?"text-primary":"text-secondary"}><FaCheckDouble/></div>
   );
 }
 
@@ -237,9 +245,12 @@ function MyChatBubble({message})
 {
   return (
     <div className={"row justify-content-end"}>
-      <div className={"col-5 rounded text-left text-light justify-content-end bg-primary"}>
+      <div style={{backgroundColor:'darkgreen'}} className={"col-5 rounded text-left text-light justify-content-end"}>
         {message.content}
+        <div style={{display:"flex", justifyContent:"flex-end"}}>
         <div className={'text-right'}>{getTimeFormat( new Date(Number(message.timestamp)*1000))}</div>
+        <div className={isSentMessageReadByAll(message)?"text-info":"text-muted"}><FaCheckDouble/></div>
+        </div>
       </div>
     </div>
   );
