@@ -222,26 +222,60 @@ function Channels({channels, messages, users, openChat})
   );
 }
 
-function ChatDateBubble({message})
+function ChatDateBubble({message, sameDate})
 {
   return (
-    <div className="row col-12 justify-content-around"><div className='bg-light col-2 rounded text-secondary'>{getChatDateString(message.timestamp)}</div></div>
+    <>
+    {
+      sameDate?<></>:<div className="row justify-content-around"><div style={{height:"30px"}} className='bg-light col-2 rounded text-secondary'>{getChatDateString(message.timestamp)}</div></div>
+    }
+    </>
   )
 }
 
-function ChatBubble({message, showName})
+function MyChatBubble({message})
 {
-  let myMessage = isMyMessage(message);
   return (
-    <div className={!myMessage?"row justify-content-start":"row justify-content-end"}>
-      <div className={"col-5 rounded text-left "+ (!myMessage?"justify-content-start bg-light":" text-light justify-content-end bg-primary")}>
-        {showName?<div><h6>{getSenderName(message)}</h6></div>:<></>}
+    <div className={"row justify-content-end"}>
+      <div className={"col-5 rounded text-left text-light justify-content-end bg-primary"}>
         {message.content}
-        <div className={'text-right '+(!myMessage?'text-secondary':'')}>{getTimeFormat( new Date(Number(message.timestamp)*1000))}</div>
+        <div className={'text-right'}>{getTimeFormat( new Date(Number(message.timestamp)*1000))}</div>
       </div>
     </div>
   );
 }
+
+function OtherChatBubble({message})
+{
+  return (
+    <div className={"row justify-content-start"}>
+      <div className={"col-5 rounded text-left justify-content-start bg-light"}>
+        {message.content}
+        <div className={'text-right text-secondary'}>{getTimeFormat( new Date(Number(message.timestamp)*1000))}</div>
+      </div>
+    </div>
+  );
+}
+
+function OtherGroupChatBubble({message, showName})
+{
+  return (
+    <div className={"row justify-content-start "}>
+      <div className='col-1'>
+        {
+          showName?
+            <img style={{height:"50px"}} className='rounded-circle bg-danger' src={getUser(message.sender).picture} />:
+            <div className='' style={{height:"60px", width:"60px"}}></div>}
+        </div>
+      <div className={"col-4 rounded text-left justify-content-start bg-light"}>
+        {showName?<div><h6>{getSenderName(message)}</h6></div>:<></>}
+        {message.content}
+        <div className={'text-right text-secondary'}>{getTimeFormat( new Date(Number(message.timestamp)*1000))}</div>
+      </div>
+    </div>
+  );
+}
+
 
 function ChatBox({messages, channel})
 {
@@ -252,27 +286,40 @@ function ChatBox({messages, channel})
   let sameDate = false;
   let sameSender = false;
   let showNamePic = false;
+  let myMessage = false;
   return (
-    <div className="col-8">
+    <div id="chatbox" className="col-8">
       <div><h3>{getChannelName(channel)}</h3></div>
-      {messages.map((message) => 
-      {
-        currDate = message.timestamp;
-        currSender = message.sender;
-        sameDate = isSameDate(prevDate, currDate);
-        sameSender = (currSender === prevSender);
-        console.log("isMymessage: ", isMyMessage(message));
-        showNamePic = ( !sameDate || !sameSender) && !isMyMessage(message) && isChannelGroup(channel);
-        prevDate = currDate;
-        prevSender = currSender;
-        return (
-          <>
-          {sameDate?<></>:<ChatDateBubble message={message}></ChatDateBubble>}
-          {showNamePic?<div>pic</div>:<></>}
-          <ChatBubble showName={showNamePic} channel={channel} message={message}></ChatBubble></>
-        ); 
-      }
-      )}
+      <div style={{height:"400px", 'overflow-y':"auto", display:"flex", "flex-direction":"column"}}>
+        {messages.map((message) => 
+        {
+          currDate = message.timestamp;
+          currSender = message.sender;
+          sameDate = isSameDate(prevDate, currDate);
+          sameSender = (currSender === prevSender);
+          myMessage = isMyMessage(message);
+          showNamePic = ( !sameDate || !sameSender) && !isMyMessage(message) && isChannelGroup(channel);
+          prevDate = currDate;
+          prevSender = currSender;
+          return (
+            <>
+            <ChatDateBubble message={message} sameDate={sameDate}></ChatDateBubble>
+            {
+              myMessage?
+              <MyChatBubble message={message}></MyChatBubble>:
+              <>
+                {
+                  isChannelGroup(channel)?
+                  <OtherGroupChatBubble message={message} showName={showNamePic}></OtherGroupChatBubble>:
+                  <OtherChatBubble message={message}></OtherChatBubble>
+                }
+              </>
+            }
+            </>
+          ); 
+        }
+        )}
+      </div>
     </div>
   );
 }
@@ -284,7 +331,7 @@ function App() {
     setCurrentChanelID(channel.id);
   }
   return (
-    <div className="App"> 
+    <div style={{}} className="App"> 
       <div className="row">
         <Channels openChat={openChat}  channels={nav_data['channels']} messages={nav_data.messages} users={nav_data.users}></Channels>      
         {(currentChannelID !== 'home')?<ChatBox messages={messages[currentChannelID]} channel={getChannel(currentChannelID)}></ChatBox>:<>Click on a Channel to start a chat!</>}

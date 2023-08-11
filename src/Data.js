@@ -107,21 +107,21 @@ let users = [
     id: '1',
     name: 'Navjot Singh',
     email: 'navjot@gmail.com',
-    picture: 'abc.jpeg',
+    picture: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
     channels: ['1', '2', '3']
   },
   {
     id: '2',
     name: 'Swapnil More',
     email: 'swapnil@gmail.com',
-    picture: 'abc.jpeg',
+    picture: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
     channels: ['1', '3']
   },
   {
     id: '3',
     name: 'Raavi',
     email: 'raavi@gmail.com',
-    picture: 'abc.jpeg',
+    picture: 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
     channels: ['2', '3']
   }
 ]
